@@ -84,12 +84,12 @@ export function transformType(
 				fragmentSpreads: [],
 				kind: 'Object',
 				schemaType: leafGraphQLType as GraphQLObjectType,
-			}
+		  }
 		: {
 				kind: 'Scalar',
 				knownPossibleValues: knownValues,
 				schemaType: leafGraphQLType as GraphQLScalarType,
-			};
+		  };
 	const fragmentType = transformTypes
 		.reverse()
 		.reduce((t, transformer) => transformer(t), leafType as T.FragmentType);

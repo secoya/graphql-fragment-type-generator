@@ -30,13 +30,23 @@ test('Can remove ignored fields', () => {
 
 	const mapped = mapOperationType(schema, ast, ['ignoredName']);
 
+	const schemaType = schema.getType('Person');
+	if (schemaType == null) {
+		throw new Error('Schema type Person was not found');
+	}
+
+	const querySchemaType = schema.getQueryType();
+	if (querySchemaType == null) {
+		throw new Error('Query schema type was not found');
+	}
+
 	const expected: typeof mapped = {
 		fields: [
 			{
 				exportName: null,
 				fieldName: 'person',
 				resultFieldName: 'person',
-				schemaType: schema.getType('Person') as GraphQLObjectType,
+				schemaType: schemaType,
 				type: {
 					fields: [
 						{
@@ -53,13 +63,13 @@ test('Can remove ignored fields', () => {
 					],
 					fragmentSpreads: [],
 					kind: 'Object',
-					schemaType: schema.getType('Person') as GraphQLObjectType,
+					schemaType: schemaType,
 				},
 			},
 		],
 		fragmentSpreads: [],
 		kind: 'Object',
-		schemaType: schema.getQueryType(),
+		schemaType: querySchemaType,
 	};
 	expect(mapped).toEqual(expected);
 });

@@ -113,7 +113,7 @@ function DocumentIsMultipleFragmentsWithRootNamed(rootFragmentName: string): any
 			const fragmentNames = new Set<string>();
 			definitions.forEach(d => {
 				fragmentNames.add(d.name.value);
-				visit(d, generateVisitor(d), null);
+				visit(d, generateVisitor(d));
 			});
 
 			const namesVisited = new Set<string>();
@@ -171,7 +171,7 @@ function DocumentIsMultipleFragmentsWithRootNamed(rootFragmentName: string): any
 	});
 }
 
-export function validateSingleFragmentAST(schema: GraphQLSchema, document: DocumentNode): GraphQLError[] {
+export function validateSingleFragmentAST(schema: GraphQLSchema, document: DocumentNode): ReadonlyArray<GraphQLError> {
 	return validate(schema, document, singleFragmentRules);
 }
 
@@ -179,7 +179,7 @@ export function validateMultiFragmentAST(
 	schema: GraphQLSchema,
 	document: DocumentNode,
 	rootFragmentName: string,
-): GraphQLError[] {
+): ReadonlyArray<GraphQLError> {
 	return validate(
 		schema,
 		document,

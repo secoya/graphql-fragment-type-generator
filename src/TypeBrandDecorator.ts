@@ -23,7 +23,7 @@ export function decorateWithTypeBrands(type: T.FlattenedObjectType): T.Flattened
 								true,
 							),
 							schemaType,
-						),
+						) as T.FlattenedFieldInfoWithMeta[],
 						schemaType,
 					),
 					kind: 'SpecificObject',
@@ -33,7 +33,7 @@ export function decorateWithTypeBrands(type: T.FlattenedObjectType): T.Flattened
 		);
 		return {
 			fields: null,
-			fragmentSpreads: sortBy(schemaSpreadFields, t => t.schemaType.name),
+			fragmentSpreads: sortBy(schemaSpreadFields, t => t.schemaType.name) as T.FlattenedSpecificObjectType[],
 			kind: 'Object',
 			objectKind: 'Spread',
 			schemaTypes: type.schemaTypes,
@@ -51,7 +51,10 @@ export function decorateWithTypeBrands(type: T.FlattenedObjectType): T.Flattened
 				for (const t of s.schemaTypes) {
 					carry.push({
 						fields: decorateFieldsWithTypeBrands(
-							withMeta(mapWithConstantTypeNameValues(s.fields, [t], true), t),
+							withMeta(
+								mapWithConstantTypeNameValues(s.fields, [t], true),
+								t,
+							) as T.FlattenedFieldInfoWithMeta[],
 							t,
 						),
 						kind: 'SpecificObject',
@@ -66,7 +69,7 @@ export function decorateWithTypeBrands(type: T.FlattenedObjectType): T.Flattened
 
 	return {
 		...type,
-		fragmentSpreads: sortBy(spreadFields, t => t.schemaType.name),
+		fragmentSpreads: sortBy(spreadFields, t => t.schemaType.name) as T.FlattenedSpreadType[],
 	};
 }
 

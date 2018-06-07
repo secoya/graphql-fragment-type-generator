@@ -4,7 +4,7 @@ import { groupBy, sortBy, uniqueBy } from './utils';
 
 type StackType = GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType;
 
-function possibleTypesForType(schema: GraphQLSchema, type: StackType): GraphQLObjectType[] {
+function possibleTypesForType(schema: GraphQLSchema, type: StackType): ReadonlyArray<GraphQLObjectType> {
 	if (type instanceof GraphQLObjectType) {
 		return [type];
 	}
@@ -13,16 +13,16 @@ function possibleTypesForType(schema: GraphQLSchema, type: StackType): GraphQLOb
 }
 
 function intersectPossibleTypes(
-	outerPossibleTypes: GraphQLObjectType[],
-	innerPossibleTypes: GraphQLObjectType[],
-): GraphQLObjectType[] {
+	outerPossibleTypes: ReadonlyArray<GraphQLObjectType>,
+	innerPossibleTypes: ReadonlyArray<GraphQLObjectType>,
+): ReadonlyArray<GraphQLObjectType> {
 	return innerPossibleTypes.filter(t => outerPossibleTypes.indexOf(t) >= 0);
 }
 
 export function withMeta(
-	fields: T.FlattenedFieldInfo[],
+	fields: ReadonlyArray<T.FlattenedFieldInfo>,
 	sourceType: GraphQLObjectType | GraphQLInterfaceType | GraphQLUnionType,
-): T.FlattenedFieldInfoWithMeta[] {
+): ReadonlyArray<T.FlattenedFieldInfoWithMeta> {
 	if (sourceType instanceof GraphQLUnionType) {
 		return fields.map(f => {
 			return {
@@ -57,8 +57,8 @@ export function withMeta(
 function flattenFragmentSpread(
 	schema: GraphQLSchema,
 	type: T.ObjectType,
-	possibleTypes: GraphQLObjectType[],
-): T.FlattenedSpecificObjectType[] {
+	possibleTypes: ReadonlyArray<GraphQLObjectType>,
+): ReadonlyArray<T.FlattenedSpecificObjectType> {
 	return type.fragmentSpreads.reduce(
 		(carry, spread) => {
 			const possibleSpreadTypes = intersectPossibleTypes(
@@ -81,7 +81,10 @@ function flattenFragmentSpread(
 				}));
 				for (const t of possibleInnerSpreadTypes) {
 					carry.push({
-						fields: withMeta(mapWithConstantTypeNameValues(spreadFields, t, false), t),
+						fields: withMeta(
+							mapWithConstantTypeNameValues(spreadFields, t, false),
+							t,
+						) as T.FlattenedFieldInfoWithMeta[],
 						kind: 'SpecificObject',
 						schemaType: t,
 					});
@@ -97,7 +100,7 @@ function flattenFragmentSpread(
 			}));
 			for (const t of possibleSpreadTypes) {
 				carry.push({
-					fields: withMeta(fields, t),
+					fields: withMeta(fields, t) as T.FlattenedFieldInfoWithMeta[],
 					kind: 'SpecificObject',
 					schemaType: t,
 				});
@@ -105,7 +108,7 @@ function flattenFragmentSpread(
 			return carry;
 		},
 		[] as T.FlattenedSpecificObjectType[],
-	);
+	) as ReadonlyArray<T.FlattenedSpecificObjectType>;
 }
 
 export function normalizeType(schema: GraphQLSchema, type: T.ObjectType): T.FlattenedObjectType {
@@ -135,11 +138,14 @@ function normalizeObjectType(schema: GraphQLSchema, type: T.ObjectType): T.Flatt
 
 	if (spreads.length === 0) {
 		return {
-			fields: withMeta(mapWithConstantTypeNameValues(fields, possibleTypes, false), type.schemaType),
+			fields: withMeta(
+				mapWithConstantTypeNameValues(fields, possibleTypes, false),
+				type.schemaType,
+			) as T.FlattenedFieldInfoWithMeta[],
 			fragmentSpreads: null,
 			kind: 'Object',
 			objectKind: 'Single',
-			schemaTypes: possibleTypes,
+			schemaTypes: possibleTypes as GraphQLObjectType[],
 		};
 	}
 
@@ -153,7 +159,7 @@ function normalizeObjectType(schema: GraphQLSchema, type: T.ObjectType): T.Flatt
 			fields: withMeta(
 				mapWithConstantTypeNameValues(spreads[0].fields, spreads[0].schemaType, false),
 				spreads[0].schemaType,
-			),
+			) as T.FlattenedFieldInfoWithMeta[],
 			fragmentSpreads: null,
 			kind: 'Object',
 			objectKind: 'Single',
@@ -171,12 +177,15 @@ function normalizeObjectType(schema: GraphQLSchema, type: T.ObjectType): T.Flatt
 			kind: 'SpecificObject' as 'SpecificObject',
 			schemaType: t,
 		};
-	});
+	}) as T.FlattenedSpecificObjectType[];
 
 	const collapsedSpreads = collapseFragmentSpreads(schema, [], spreads.concat(fieldsToSpreads));
 
 	const constantMappedSpreads: T.FlattenedSpreadType[] = collapsedSpreads.map(s => ({
-		fields: withMeta(mapWithConstantTypeNameValues(s.fields, s.schemaType, false), s.schemaType),
+		fields: withMeta(
+			mapWithConstantTypeNameValues(s.fields, s.schemaType, false),
+			s.schemaType,
+		) as T.FlattenedFieldInfoWithMeta[],
 		kind: 'SpecificObject' as 'SpecificObject',
 		schemaType: s.schemaType,
 	}));
@@ -188,18 +197,18 @@ function normalizeObjectType(schema: GraphQLSchema, type: T.ObjectType): T.Flatt
 						fields: withMeta(
 							sortBy(mapWithConstantTypeNameValues(fields, missingTypes, false), t => t.resultFieldName),
 							type.schemaType,
-						),
+						) as T.FlattenedFieldInfoWithMeta[],
 						kind: 'RestObject',
 						schemaTypes: missingTypes,
 					},
-				]
+			  ]
 			: [];
 	return {
 		fields: null,
 		fragmentSpreads: constantMappedSpreads.concat(restSpread),
 		kind: 'Object',
 		objectKind: 'Spread',
-		schemaTypes: possibleTypes,
+		schemaTypes: possibleTypes as GraphQLObjectType[],
 	};
 }
 
@@ -228,9 +237,9 @@ function normalizeWrappedType(schema: GraphQLSchema, type: T.FragmentType): T.Fl
 
 function collapseFragmentSpreads(
 	schema: GraphQLSchema,
-	parentFields: T.FlattenedFieldInfo[],
-	spreads: T.FlattenedSpecificObjectType[],
-): T.FlattenedSpecificObjectType[] {
+	parentFields: ReadonlyArray<T.FlattenedFieldInfo>,
+	spreads: ReadonlyArray<T.FlattenedSpecificObjectType>,
+): ReadonlyArray<T.FlattenedSpecificObjectType> {
 	const grouped = groupBy(spreads, v => v.schemaType, v => v.fields);
 	const res: T.FlattenedSpecificObjectType[] = [];
 	const parentFieldsMap: Map<string, T.FlattenedType> = parentFields.reduce((carry, v) => {
@@ -252,7 +261,7 @@ function collapseFragmentSpreads(
 		});
 		if (fields.length > 0) {
 			res.push({
-				fields: withMeta(sortBy(fields, f => f.resultFieldName), type),
+				fields: withMeta(sortBy(fields, f => f.resultFieldName), type) as T.FlattenedFieldInfoWithMeta[],
 				kind: 'SpecificObject',
 				schemaType: type,
 			});
@@ -353,10 +362,10 @@ function isSameType(type1: T.FlattenedType, type2: T.FlattenedType): boolean {
 }
 
 export function mapWithConstantTypeNameValues(
-	fields: T.FlattenedFieldInfo[],
-	types: GraphQLObjectType | GraphQLObjectType[],
+	fields: ReadonlyArray<T.FlattenedFieldInfo>,
+	types: GraphQLObjectType | ReadonlyArray<GraphQLObjectType>,
 	removeConstantExportedNames: boolean,
-): T.FlattenedFieldInfo[] {
+): ReadonlyArray<T.FlattenedFieldInfo> {
 	const possibleTypes = (types instanceof GraphQLObjectType ? [types] : types).map(t => t.name);
 	const SCALAR = 'Scalar';
 	const NONNULL = 'NonNull';

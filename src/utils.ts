@@ -1,5 +1,5 @@
-export function sortBy<T, TProp>(arr: T[], property: (item: T) => TProp): T[] {
-	return arr.sort((a, b) => {
+export function sortBy<T, TProp>(arr: ReadonlyArray<T>, property: (item: T) => TProp): ReadonlyArray<T> {
+	return arr.slice().sort((a, b) => {
 		const aProp = property(a);
 		const bProp = property(b);
 
@@ -12,11 +12,14 @@ export function sortBy<T, TProp>(arr: T[], property: (item: T) => TProp): T[] {
 	});
 }
 
-export function uniqueBy<T, TUniqueVal>(arr: T[], uniqueKeySelector: (item: T) => TUniqueVal): T[] {
+export function uniqueBy<T, TUniqueVal>(
+	arr: T[] | ReadonlyArray<T>,
+	uniqueKeySelector: (item: T) => TUniqueVal,
+): ReadonlyArray<T> {
 	const uniqueValues = new Set();
 	const res: T[] = [];
 
-	arr.forEach(v => {
+	arr.slice().forEach(v => {
 		const key = uniqueKeySelector(v);
 		if (uniqueValues.has(key)) {
 			return;
@@ -29,13 +32,13 @@ export function uniqueBy<T, TUniqueVal>(arr: T[], uniqueKeySelector: (item: T) =
 }
 
 export function groupBy<T, TKey, TValue>(
-	arr: T[],
+	arr: T[] | ReadonlyArray<T>,
 	keySelector: (item: T) => TKey,
 	valueSelector: (item: T) => TValue,
 ): Map<TKey, TValue[]> {
 	const res = new Map();
 
-	arr.forEach(v => {
+	arr.slice().forEach(v => {
 		const key = keySelector(v);
 		let entry = res.get(key);
 		if (entry == null) {
@@ -44,5 +47,6 @@ export function groupBy<T, TKey, TValue>(
 		}
 		entry.push(valueSelector(v));
 	});
+
 	return res;
 }

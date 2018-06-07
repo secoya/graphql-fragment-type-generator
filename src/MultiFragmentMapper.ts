@@ -44,7 +44,7 @@ export function mapMultiFragmentType(
 	return mapType(schema, ast, fragmentNode, removeFieldsNamed, allowUndefinedFragmentSpread);
 }
 
-function getExportName(directives: DirectiveNode[] | undefined): string | null {
+function getExportName(directives: ReadonlyArray<DirectiveNode> | undefined): string | null {
 	if (directives == null) {
 		return null;
 	}
@@ -96,7 +96,7 @@ export function mapType(
 					const exportName = getExportName(field.directives);
 					const fieldName = field.name.value;
 					const resultFieldName = field.alias != null ? field.alias.value : field.name.value;
-					if (ignoredNames.has(resultFieldName)) {
+					if (type == null || ignoredNames.has(resultFieldName)) {
 						return;
 					}
 					if (field.selectionSet != null) {
@@ -194,7 +194,7 @@ export function mapType(
 		}
 		const typeInfo = new TypeInfo(schema);
 		const stack: T.ObjectType[] = [];
-		visit(fragmentDefinition, visitWithTypeInfo(typeInfo, visitor(typeInfo, stack)), null);
+		visit(fragmentDefinition, visitWithTypeInfo(typeInfo, visitor(typeInfo, stack)));
 
 		if (stack.length !== 1) {
 			throw new Error('Expected to find single fragment in fragment text');
@@ -215,7 +215,9 @@ export function mapType(
 		const rootType =
 			opName === 'query'
 				? schema.getQueryType()
-				: opName === 'mutation' ? schema.getMutationType() : schema.getSubscriptionType();
+				: opName === 'mutation'
+					? schema.getMutationType()
+					: schema.getSubscriptionType();
 
 		if (rootType == null) {
 			throw new Error('Root type cannot be null or undefined');
@@ -228,7 +230,7 @@ export function mapType(
 			schemaType: rootType,
 		};
 		rootStack.push(res);
-		visit(rootNode, visitWithTypeInfo(typeInfo, visitor(typeInfo, rootStack)), null);
+		visit(rootNode, visitWithTypeInfo(typeInfo, visitor(typeInfo, rootStack)));
 		return res;
 	}
 }

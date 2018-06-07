@@ -198,7 +198,9 @@ export function printType(nullable: boolean, type: T.FlattenedType, withNames: b
 
 					const typeDef =
 						withNames && f.exportName != null
-							? f.type.kind === 'NonNull' ? f.exportName : `${f.exportName} | null`
+							? f.type.kind === 'NonNull'
+								? f.exportName
+								: `${f.exportName} | null`
 							: printType(true, f.type, withNames, i + 4);
 					buffer.push(`${indents + '  '}${fieldName}: ${typeDef};`);
 					if (idx < fields.length - 1) {
