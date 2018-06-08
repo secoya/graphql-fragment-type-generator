@@ -1,4 +1,4 @@
-import * as AggregateError from 'aggregate-error';
+import AggregateError = require('aggregate-error');
 import { DocumentNode, FragmentDefinitionNode, GraphQLList, GraphQLSchema } from 'graphql';
 import { isPluralFragmentDefinition, mapSchema } from './FragmentMapperUtilities';
 import { mapType } from './MultiFragmentMapper';

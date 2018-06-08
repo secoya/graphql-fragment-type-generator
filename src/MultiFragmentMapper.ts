@@ -1,4 +1,4 @@
-import * as AggregateError from 'aggregate-error';
+import AggregateError = require('aggregate-error');
 import {
 	validate,
 	visit,

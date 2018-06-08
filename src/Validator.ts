@@ -8,7 +8,6 @@ import {
 	GraphQLSchema,
 	ValidationContext,
 } from 'graphql';
-import { ArgumentsOfCorrectType } from 'graphql/validation/rules/ArgumentsOfCorrectType';
 import { FieldsOnCorrectType } from 'graphql/validation/rules/FieldsOnCorrectType';
 import { FragmentsOnCompositeTypes } from 'graphql/validation/rules/FragmentsOnCompositeTypes';
 import { KnownArgumentNames } from 'graphql/validation/rules/KnownArgumentNames';
@@ -22,10 +21,11 @@ import { ScalarLeafs } from 'graphql/validation/rules/ScalarLeafs';
 import { UniqueArgumentNames } from 'graphql/validation/rules/UniqueArgumentNames';
 import { UniqueDirectivesPerLocation } from 'graphql/validation/rules/UniqueDirectivesPerLocation';
 import { UniqueInputFieldNames } from 'graphql/validation/rules/UniqueInputFieldNames';
+import { ValuesOfCorrectType } from 'graphql/validation/rules/ValuesOfCorrectType';
+import { VariablesDefaultValueAllowed } from 'graphql/validation/rules/VariablesDefaultValueAllowed';
 import { VariablesInAllowedPosition } from 'graphql/validation/rules/VariablesInAllowedPosition';
 
 const singleFragmentRules = [
-	ArgumentsOfCorrectType,
 	FieldsOnCorrectType,
 	FragmentsOnCompositeTypes,
 	KnownArgumentNames,
@@ -37,13 +37,14 @@ const singleFragmentRules = [
 	UniqueArgumentNames,
 	UniqueDirectivesPerLocation,
 	UniqueInputFieldNames,
+	ValuesOfCorrectType,
+	VariablesDefaultValueAllowed,
 	VariablesInAllowedPosition,
 	// Custom rules
 	DocumentContainsSingleFragment,
 ];
 
 const multiFragmentRules = [
-	ArgumentsOfCorrectType,
 	FieldsOnCorrectType,
 	FragmentsOnCompositeTypes,
 	KnownArgumentNames,
@@ -57,6 +58,7 @@ const multiFragmentRules = [
 	UniqueArgumentNames,
 	UniqueDirectivesPerLocation,
 	UniqueInputFieldNames,
+	ValuesOfCorrectType,
 	VariablesInAllowedPosition,
 ];
 

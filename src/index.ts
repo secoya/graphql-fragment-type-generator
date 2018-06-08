@@ -1,4 +1,4 @@
-import * as AggregateError from 'aggregate-error';
+import AggregateError = require('aggregate-error');
 import { buildClientSchema, parse, validate, GraphQLSchema, Source } from 'graphql';
 import { extractNamedTypes } from './ExtractNamedTypes';
 import { mapFragmentType } from './FragmentMapper';
