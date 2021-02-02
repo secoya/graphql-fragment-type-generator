@@ -423,12 +423,12 @@ fragment P on Planet {
 	const typeNames = `export type NodeType = {
   '': Person;
 
+  filmConnection: FilmType | null;
+
   /**
    * The name of this person.
    */
   name: string | null;
-
-  filmConnection: FilmType | null;
 };
 export type FilmType = {
   '': PersonFilmsConnection;
